@@ -2,6 +2,8 @@ name: boilr
 description: A Dart CLI tool for generating Flutter projects with pre-configured packages and architecture.
 version: 0.0.1
 repository: https://github.com/shadatrahman/boilr
+executables:
+  boilr: boilr
 
 environment:
   sdk: ^3.9.2
