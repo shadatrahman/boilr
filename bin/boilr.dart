@@ -18,7 +18,7 @@ void main(List<String> arguments) {
     return;
   }
 
-  if (arguments.contains('--help') || arguments.contains('-h')) {
+  if ((arguments.contains('--help') || arguments.contains('-h')) && arguments.length == 1) {
     print('boilr - Flutter project generator CLI');
     print('');
     print('Usage: boilr <command> [arguments]');
