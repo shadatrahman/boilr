@@ -306,17 +306,20 @@ boilr generates projects following clean architecture principles:
 boilr sets up a professional development environment with:
 
 ### Code Quality & Linting
+
 - **Strict Type Checking**: Enforces explicit type inference and raw types
 - **Const Optimization**: Promotes const usage for better performance
 - **Flutter Lints**: Includes `package:flutter_lints/flutter.yaml`
 - **Custom Rules**: Pre-configured linting rules for production code
 
 ### VS Code Integration
+
 - **Automatic Formatting**: Formats code on save
 - **Code Actions**: Auto-fixes linting issues and organizes imports
 - **Dart-Specific Settings**: Optimized for Flutter development
 
 ### Navigation System
+
 - **Centralized Router**: Type-safe route constants in Router class
 - **Named Routes**: Support for `context.goNamed()` navigation
 - **Automatic Updates**: New features automatically register routes
@@ -325,6 +328,7 @@ boilr sets up a professional development environment with:
 ### Generated Configuration Files
 
 **analysis_options.yaml:**
+
 ```yaml
 include: package:flutter_lints/flutter.yaml
 
@@ -348,6 +352,7 @@ formatter:
 ```
 
 **.vscode/settings.json:**
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -366,13 +371,14 @@ formatter:
 boilr generates a centralized Router class for type-safe navigation:
 
 ### Router Class
+
 ```dart
 class Router {
   // Route paths
   static const String login = '/login';
   static const String home = '/home';
   static const String userProfile = '/user_profile';
-  
+
   // Route names for context.goNamed()
   static const String loginName = 'login';
   static const String homeName = 'home';
@@ -381,6 +387,7 @@ class Router {
 ```
 
 ### Navigation Examples
+
 ```dart
 // Navigate using path
 context.go(Router.userProfile);
@@ -392,7 +399,9 @@ context.pushNamed(Router.homeName);
 ```
 
 ### Automatic Route Registration
+
 When you create a new feature, it's automatically added to the Router:
+
 ```bash
 dart run bin/boilr.dart create feature product_catalog
 # Automatically adds:

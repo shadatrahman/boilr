@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 ### Added
+
 - **Centralized Router Class**: Type-safe navigation with Router constants
 - **Named Routes**: Support for `context.goNamed()` navigation with automatic route registration
 - **Professional Development Environment**: Comprehensive linting and formatting configuration
@@ -11,6 +12,7 @@
 - **Clean Code Generation**: All generated code is lint-free and follows best practices
 
 ### Enhanced
+
 - **Feature Command**: Now automatically updates router with new routes
 - **Project Generation**: Includes professional development environment setup
 - **Code Quality**: Strict linting rules and const optimization
@@ -18,6 +20,7 @@
 - **Developer Experience**: Zero-configuration VS Code setup
 
 ### Fixed
+
 - **DioClient Type Mismatch**: Fixed Dio vs DioClient type issues in repository implementations
 - **Static Getter Access**: Corrected static getter access patterns
 - **Import Issues**: Added missing Dio imports in repository implementations
@@ -25,6 +28,7 @@
 - **Unused Imports**: Removed unused imports from generated page files
 
 ### Technical Improvements
+
 - **Router System**: Centralized route management with type safety
 - **Linting Configuration**: Professional-grade code quality rules
 - **Formatter Settings**: Trailing commas preservation for cleaner diffs
