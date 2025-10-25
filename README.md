@@ -6,33 +6,33 @@
 
 ### Installation
 
-1. Clone this repository:
+Install boilr globally using Dart's pub tool:
 
 ```bash
-git clone <repository-url>
-cd boilr
+dart pub global activate boilr
 ```
 
-2. Install dependencies:
+**Note:** Make sure your `$PATH` includes the pub global bin directory. The directory location varies by platform:
 
+- **macOS/Linux:** `~/.pub-cache/bin`
+- **Windows:** `%LOCALAPPDATA%\Pub\Cache\bin`
+
+To add it permanently:
+
+**macOS/Linux:**
 ```bash
-dart pub get
+export PATH="$PATH":"$HOME/.pub-cache/bin"
 ```
 
-3. Make the CLI globally available (optional):
-
-```bash
-# Add to your PATH or create an alias
-alias boilr="dart run /path/to/boilr/bin/boilr.dart"
+**Windows (PowerShell):**
+```powershell
+[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";$env:LOCALAPPDATA\Pub\Cache\bin", "User")
 ```
 
 ### Basic Usage
 
 ```bash
 # Run commands directly
-dart run bin/boilr.dart <command>
-
-# Or if you've set up the alias
 boilr <command>
 ```
 
@@ -43,13 +43,13 @@ boilr <command>
 Creates a complete Flutter project with all necessary packages and architecture:
 
 ```bash
-dart run bin/boilr.dart create project <name> --org <package_name>
+boilr create project <name> --org <package_name>
 ```
 
 **Example:**
 
 ```bash
-dart run bin/boilr.dart create project myapp --org com.example.myapp
+boilr create project myapp --org com.example.myapp
 ```
 
 **What it does:**
@@ -94,13 +94,13 @@ lib/
 Creates a complete feature module following clean architecture principles:
 
 ```bash
-dart run bin/boilr.dart create feature <name>
+boilr create feature <name>
 ```
 
 **Example:**
 
 ```bash
-dart run bin/boilr.dart create feature auth
+boilr create feature auth
 ```
 
 **What it does:**
@@ -136,13 +136,13 @@ lib/features/<name>/
 Generates a ConsumerWidget with Riverpod integration:
 
 ```bash
-dart run bin/boilr.dart create widget <name>
+boilr create widget <name>
 ```
 
 **Example:**
 
 ```bash
-dart run bin/boilr.dart create widget MyButton
+boilr create widget MyButton
 ```
 
 **Generated Code:**
@@ -166,13 +166,13 @@ class MyButton extends ConsumerWidget {
 Creates a Flutter screen with Riverpod integration:
 
 ```bash
-dart run bin/boilr.dart create page <name>
+boilr create page <name>
 ```
 
 **Example:**
 
 ```bash
-dart run bin/boilr.dart create page LoginPage
+boilr create page LoginPage
 ```
 
 **Generated Code:**
@@ -209,13 +209,13 @@ class LoginPage extends ConsumerWidget {
 Generates a Riverpod provider and state class:
 
 ```bash
-dart run bin/boilr.dart create provider <name>
+boilr create provider <name>
 ```
 
 **Example:**
 
 ```bash
-dart run bin/boilr.dart create provider AuthProvider
+boilr create provider AuthProvider
 ```
 
 **Generated Code:**
@@ -238,25 +238,25 @@ Get help for any command:
 
 ```bash
 # General help
-dart run bin/boilr.dart --help
+boilr --help
 
 # Create command help
-dart run bin/boilr.dart create --help
+boilr create --help
 
 # Project command help
-dart run bin/boilr.dart create project --help
+boilr create project --help
 
 # Feature command help
-dart run bin/boilr.dart create feature --help
+boilr create feature --help
 
 # Widget command help
-dart run bin/boilr.dart create widget --help
+boilr create widget --help
 
 # Page command help
-dart run bin/boilr.dart create page --help
+boilr create page --help
 
 # Provider command help
-dart run bin/boilr.dart create provider --help
+boilr create provider --help
 ```
 
 ## 📦 Pre-configured Packages
@@ -403,7 +403,7 @@ context.pushNamed(Router.homeName);
 When you create a new feature, it's automatically added to the Router:
 
 ```bash
-dart run bin/boilr.dart create feature product_catalog
+boilr create feature product_catalog
 # Automatically adds:
 # - Router.productCatalog = '/product_catalog'
 # - Router.productCatalogName = 'product_catalog'
@@ -428,7 +428,7 @@ dart run bin/boilr.dart create feature product_catalog
 1. **Create a new Flutter project:**
 
 ```bash
-dart run bin/boilr.dart create project myapp --org com.example.myapp
+boilr create project myapp --org com.example.myapp
 ```
 
 2. **Navigate to your project:**
@@ -453,9 +453,9 @@ flutter run
 
 ```bash
 # From within your project directory
-dart run ../boilr/bin/boilr.dart create feature auth
-dart run ../boilr/bin/boilr.dart create widget CustomButton
-dart run ../boilr/bin/boilr.dart create page HomePage
+boilr create feature auth
+boilr create widget CustomButton
+boilr create page HomePage
 ```
 
 ## 🔧 Development
