@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:args/args.dart';
 import 'package:path/path.dart' as path;
 import '../utils/file_utils.dart';
@@ -89,6 +90,9 @@ class FeatureCommand {
 
     // Generate page
     _generatePage(featureName, featurePath);
+
+    // Update router with new feature
+    _updateRouter(featureName);
   }
 
   void _generateEntity(String featureName, String featurePath) {
@@ -183,21 +187,21 @@ abstract class ${entityName}Repository {
     final modelName = '${entityName}Model';
     final repositoryContent =
         '''import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import '../../../../core/error/failures.dart';
-import '../../../../core/network/dio_client.dart';
 import '../../domain/entities/${featureName}_entity.dart';
 import '../../domain/repositories/${featureName}_repository.dart';
 import '../models/${featureName}_model.dart';
 
 class ${entityName}RepositoryImpl implements ${entityName}Repository {
-  final DioClient _dioClient;
+  final Dio _dio;
 
-  ${entityName}RepositoryImpl(this._dioClient);
+  ${entityName}RepositoryImpl(this._dio);
 
   @override
   Future<Either<Failure, List<${entityName}Entity>>> get${entityName}s() async {
     try {
-      final response = await _dioClient.instance.get('/${featureName}s');
+      final response = await _dio.get('/${featureName}s');
       final List<dynamic> data = response.data;
       final models = data.map((json) => ${modelName}.fromJson(json)).toList();
       final entities = models.map((model) => model.toEntity()).toList();
@@ -210,7 +214,7 @@ class ${entityName}RepositoryImpl implements ${entityName}Repository {
   @override
   Future<Either<Failure, ${entityName}Entity>> get${entityName}ById(int id) async {
     try {
-      final response = await _dioClient.instance.get('/${featureName}s/\$id');
+      final response = await _dio.get('/${featureName}s/\$id');
       final model = ${modelName}.fromJson(response.data);
       return Right(model.toEntity());
     } catch (e) {
@@ -251,12 +255,12 @@ import '../../../../core/network/dio_client.dart';
 import '../../data/repositories/${featureName}_repository_impl.dart';
 import '../../domain/usecases/get_${featureName}s_usecase.dart';
 
-final ${featureName}RepositoryProvider = Provider((ref) {
+final ${_toCamelCase(featureName)}RepositoryProvider = Provider((ref) {
   return ${entityName}RepositoryImpl(DioClient.instance);
 });
 
 final get${entityName}sUseCaseProvider = Provider((ref) {
-  final repository = ref.watch(${featureName}RepositoryProvider);
+  final repository = ref.watch(${_toCamelCase(featureName)}RepositoryProvider);
   return Get${entityName}sUseCase(repository);
 });''';
 
@@ -268,7 +272,6 @@ final get${entityName}sUseCaseProvider = Provider((ref) {
     final pageContent =
         '''import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/${featureName}_provider.dart';
 
 class ${entityName}Page extends ConsumerWidget {
   const ${entityName}Page({super.key});
@@ -289,7 +292,115 @@ class ${entityName}Page extends ConsumerWidget {
     FileUtils.writeFile(path.join(featurePath, 'presentation/pages/${featureName}_page.dart'), pageContent);
   }
 
+  void _updateRouter(String featureName) {
+    final routerPath = path.join('lib', 'core', 'router', 'app_router.dart');
+
+    // Check if router file exists
+    if (!File(routerPath).existsSync()) {
+      Logger.warning('Router file not found. Skipping router update.');
+      return;
+    }
+
+    try {
+      final routerContent = File(routerPath).readAsStringSync();
+      final entityName = _toPascalCase(featureName);
+      final routePath = '/${featureName}';
+      final routeName = featureName;
+
+      // Add import for the new feature page
+      final importLine = "import '../../features/${featureName}/presentation/pages/${featureName}_page.dart';";
+      final contentWithImport = _addImportIfNotExists(routerContent, importLine);
+
+      // Add route constants to Router class
+      final contentWithConstants = _addRouteConstants(contentWithImport, featureName, routePath, routeName);
+
+      // Add route to the routes array
+      final finalContent = _addRouteToRouter(contentWithConstants, featureName, entityName, routePath, routeName);
+
+      File(routerPath).writeAsStringSync(finalContent);
+      Logger.success('✅ Router updated with new feature route');
+    } catch (e) {
+      Logger.warning('Failed to update router: $e');
+    }
+  }
+
+  String _addImportIfNotExists(String content, String importLine) {
+    if (content.contains(importLine)) {
+      return content;
+    }
+
+    // Find the last import statement and add after it
+    final importRegex = RegExp(r"import '[^']+';");
+    final matches = importRegex.allMatches(content).toList();
+
+    if (matches.isNotEmpty) {
+      final lastMatch = matches.last;
+      final insertPosition = lastMatch.end;
+      return content.substring(0, insertPosition) + '\n' + importLine + content.substring(insertPosition);
+    }
+
+    return content;
+  }
+
+  String _addRouteConstants(String content, String featureName, String routePath, String routeName) {
+    final camelCaseName = _toCamelCase(featureName);
+    final routeConstant =
+        '''
+  static const String ${camelCaseName} = '$routePath';
+  static const String ${camelCaseName}Name = '$routeName';''';
+
+    // Find the Router class and add constants before the closing brace
+    final routerClassStart = content.indexOf('class Router {');
+    if (routerClassStart == -1) {
+      return content;
+    }
+
+    // Find the last static const in the Router class
+    final lastConstMatch = RegExp(r"static const String \w+Name = '[^']+';").allMatches(content).toList();
+    if (lastConstMatch.isNotEmpty) {
+      final lastMatch = lastConstMatch.last;
+      final insertPosition = lastMatch.end;
+      return content.substring(0, insertPosition) + '\n' + routeConstant + content.substring(insertPosition);
+    }
+
+    return content;
+  }
+
+  String _addRouteToRouter(String content, String featureName, String entityName, String routePath, String routeName) {
+    final camelCaseName = _toCamelCase(featureName);
+    final routeToAdd =
+        '''
+      GoRoute(
+        path: Router.${camelCaseName},
+        name: Router.${camelCaseName}Name,
+        builder: (context, state) => const ${entityName}Page(),
+      ),''';
+
+    // Find the routes array and add the new route
+    final routesStart = content.indexOf('routes: [');
+    if (routesStart == -1) {
+      return content;
+    }
+
+    final routesEnd = content.indexOf('],', routesStart);
+    if (routesEnd == -1) {
+      return content;
+    }
+
+    // Insert the new route before the closing bracket
+    final beforeRoutes = content.substring(0, routesEnd);
+    final afterRoutes = content.substring(routesEnd);
+
+    return beforeRoutes + routeToAdd + '\n    ' + afterRoutes;
+  }
+
   String _toPascalCase(String input) {
     return input.split('_').map((word) => word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1)).join('');
+  }
+
+  String _toCamelCase(String input) {
+    final words = input.split('_');
+    if (words.isEmpty) return input;
+    return words[0].toLowerCase() + words.skip(1).map((word) => word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1)).join('');
   }
 }

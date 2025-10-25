@@ -169,6 +169,8 @@ class ProjectCommand {
     _generateErrorHandling(projectName);
     _generateMainDart(projectName);
     _generateExamplePages(projectName);
+    _generateAnalysisOptions(projectName);
+    _generateVSCodeSettings(projectName);
 
     Logger.success('✅ Boilerplate code generated');
   }
@@ -234,9 +236,19 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../storage/token_manager.dart';
 
+class Router {
+  // Route paths
+  static const String login = '/login';
+  static const String home = '/home';
+  
+  // Route names for context.goNamed()
+  static const String loginName = 'login';
+  static const String homeName = 'home';
+}
+
 Future<String> _getInitialRoute() async {
   final token = await TokenManager.getToken();
-  return token != null ? '/home' : '/login';
+  return token != null ? Router.home : Router.login;
 }
 
 final routerProvider = FutureProvider<GoRouter>((ref) async {
@@ -246,17 +258,17 @@ final routerProvider = FutureProvider<GoRouter>((ref) async {
     redirect: (context, state) async {
       final token = await TokenManager.getToken();
       final isLoggedIn = token != null;
-      final isOnLogin = state.matchedLocation == '/login';
-      final isOnHome = state.matchedLocation == '/home';
+      final isOnLogin = state.matchedLocation == Router.login;
+      final isOnHome = state.matchedLocation == Router.home;
 
       // If user is logged in and tries to access login, redirect to home
       if (isLoggedIn && isOnLogin) {
-        return '/home';
+        return Router.home;
       }
       
       // If user is not logged in and tries to access home, redirect to login
       if (!isLoggedIn && isOnHome) {
-        return '/login';
+        return Router.login;
       }
 
       return null; // No redirect needed
@@ -264,11 +276,13 @@ final routerProvider = FutureProvider<GoRouter>((ref) async {
     initialLocation: initialRoute,
     routes: [
       GoRoute(
-        path: '/login',
+        path: Router.login,
+        name: Router.loginName,
         builder: (context, state) => const LoginPage(),
       ),
       GoRoute(
-        path: '/home',
+        path: Router.home,
+        name: Router.homeName,
         builder: (context, state) => const HomePage(),
       ),
     ],
@@ -446,5 +460,53 @@ class HomePage extends ConsumerWidget {
 }''';
 
     FileUtils.writeFile(path.join(projectName, 'lib/features/home/presentation/pages/home_page.dart'), homePageContent);
+  }
+
+  void _generateAnalysisOptions(String projectName) {
+    final analysisOptionsContent = '''include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    prefer_const_constructors: warning
+    prefer_const_literals_to_create_immutables: warning
+    prefer_const_declarations: warning
+    inference_failure_on_collection_literal: ignore
+    inference_failure_on_untyped_parameter: ignore
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_const_declarations: true
+
+formatter:
+  trailing_commas: preserve
+''';
+
+    FileUtils.writeFile(path.join(projectName, 'analysis_options.yaml'), analysisOptionsContent);
+  }
+
+  void _generateVSCodeSettings(String projectName) {
+    final vscodeSettingsContent = '''{
+  "editor.formatOnSave": true,
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "always",
+      "source.organizeImports": "always"
+    }
+  }
+}''';
+
+    // Create .vscode directory if it doesn't exist
+    final vscodeDir = Directory(path.join(projectName, '.vscode'));
+    if (!vscodeDir.existsSync()) {
+      vscodeDir.createSync(recursive: true);
+    }
+
+    FileUtils.writeFile(path.join(projectName, '.vscode', 'settings.json'), vscodeSettingsContent);
   }
 }
