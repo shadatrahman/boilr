@@ -1,3 +1,11 @@
+## 0.0.2
+
+### Changed
+
+- **README Updates**: Updated installation instructions for pub.dev publication
+- **Installation Method**: Changed from clone-based to `dart pub global activate boilr`
+- **Command Examples**: Updated all command examples to use `boilr` directly instead of `dart run bin/boilr.dart`
+
 ## 0.0.1
 
 ### Added

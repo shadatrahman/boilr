@@ -20,11 +20,13 @@ dart pub global activate boilr
 To add it permanently:
 
 **macOS/Linux:**
+
 ```bash
 export PATH="$PATH":"$HOME/.pub-cache/bin"
 ```
 
 **Windows (PowerShell):**
+
 ```powershell
 [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";$env:LOCALAPPDATA\Pub\Cache\bin", "User")
 ```
