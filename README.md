@@ -58,9 +58,13 @@ dart run bin/boilr.dart create project myapp --org com.example.myapp
 - Adds essential packages (Riverpod, Dio, go_router, shared_preferences, dartz, etc.)
 - Sets up clean architecture project structure
 - Pre-configures API client with Dio
-- Pre-configures routing with go_router
+- Pre-configures routing with go_router and centralized Router class
 - Creates initial project boilerplate
 - Configures state management with Riverpod
+- **NEW**: Adds comprehensive linting configuration (`analysis_options.yaml`)
+- **NEW**: Includes VS Code settings for automatic formatting
+- **NEW**: Implements named routes for type-safe navigation
+- **NEW**: Sets up professional development environment
 
 **Generated Structure:**
 
@@ -98,6 +102,16 @@ dart run bin/boilr.dart create feature <name>
 ```bash
 dart run bin/boilr.dart create feature auth
 ```
+
+**What it does:**
+
+- Creates complete feature structure with data/domain/presentation layers
+- Generates entity, model, repository, use case, and provider files
+- **NEW**: Automatically adds route to Router class
+- **NEW**: Updates app_router.dart with new feature route
+- **NEW**: Implements type-safe navigation with named routes
+- **NEW**: Follows camelCase naming conventions
+- **NEW**: Generates clean, lint-free code
 
 **Generated Structure:**
 
@@ -260,8 +274,8 @@ When creating a project, boilr automatically adds these essential packages:
 
 ### HTTP Client
 
-- `dio: ^5.4.0`
-- `curl_logger_dio_interceptor: ^0.0.2`
+- `dio: ^5.9.0`
+- `curl_logger_dio_interceptor: ^1.0.0`
 
 ### Local Storage
 
@@ -287,6 +301,106 @@ boilr generates projects following clean architecture principles:
 - **Repository Pattern**: Data access abstraction
 - **Dependency Injection**: Loose coupling between layers
 
+## 🛠️ Development Environment
+
+boilr sets up a professional development environment with:
+
+### Code Quality & Linting
+- **Strict Type Checking**: Enforces explicit type inference and raw types
+- **Const Optimization**: Promotes const usage for better performance
+- **Flutter Lints**: Includes `package:flutter_lints/flutter.yaml`
+- **Custom Rules**: Pre-configured linting rules for production code
+
+### VS Code Integration
+- **Automatic Formatting**: Formats code on save
+- **Code Actions**: Auto-fixes linting issues and organizes imports
+- **Dart-Specific Settings**: Optimized for Flutter development
+
+### Navigation System
+- **Centralized Router**: Type-safe route constants in Router class
+- **Named Routes**: Support for `context.goNamed()` navigation
+- **Automatic Updates**: New features automatically register routes
+- **Type Safety**: Autocomplete and refactoring support
+
+### Generated Configuration Files
+
+**analysis_options.yaml:**
+```yaml
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    prefer_const_constructors: warning
+    prefer_const_literals_to_create_immutables: warning
+    prefer_const_declarations: warning
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_const_declarations: true
+
+formatter:
+  trailing_commas: preserve
+```
+
+**.vscode/settings.json:**
+```json
+{
+  "editor.formatOnSave": true,
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "always",
+      "source.organizeImports": "always"
+    }
+  }
+}
+```
+
+## 🧭 Navigation System
+
+boilr generates a centralized Router class for type-safe navigation:
+
+### Router Class
+```dart
+class Router {
+  // Route paths
+  static const String login = '/login';
+  static const String home = '/home';
+  static const String userProfile = '/user_profile';
+  
+  // Route names for context.goNamed()
+  static const String loginName = 'login';
+  static const String homeName = 'home';
+  static const String userProfileName = 'user_profile';
+}
+```
+
+### Navigation Examples
+```dart
+// Navigate using path
+context.go(Router.userProfile);
+context.push(Router.home);
+
+// Navigate using named routes
+context.goNamed(Router.userProfileName);
+context.pushNamed(Router.homeName);
+```
+
+### Automatic Route Registration
+When you create a new feature, it's automatically added to the Router:
+```bash
+dart run bin/boilr.dart create feature product_catalog
+# Automatically adds:
+# - Router.productCatalog = '/product_catalog'
+# - Router.productCatalogName = 'product_catalog'
+# - GoRoute with path and name parameters
+```
+
 ## 🎯 Key Benefits
 
 1. **Complete Project Setup**: Creates fully configured Flutter projects in one command
@@ -295,6 +409,10 @@ boilr generates projects following clean architecture principles:
 4. **Architecture**: Pre-configured clean architecture with feature structure
 5. **Integration**: Automatically includes and configures essential packages
 6. **Simplicity**: One command creates a production-ready project structure
+7. **NEW**: Professional development environment with linting and formatting
+8. **NEW**: Type-safe navigation with centralized Router class
+9. **NEW**: Zero-configuration VS Code setup
+10. **NEW**: Automatic route registration for new features
 
 ## 🚀 Getting Started with a New Project
 
