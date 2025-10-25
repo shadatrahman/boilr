@@ -1,4 +1,4 @@
-## [Unreleased]
+## 0.0.1
 
 ### Added
 
@@ -34,7 +34,3 @@
 - **Formatter Settings**: Trailing commas preservation for cleaner diffs
 - **VS Code Settings**: Automatic formatting and import organization
 - **Package Updates**: Updated Dio to 5.9.0 and curl_logger_dio_interceptor to 1.0.0
-
-## 1.0.0
-
-- Initial version.
