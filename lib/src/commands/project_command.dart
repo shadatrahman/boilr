@@ -123,8 +123,27 @@ class ProjectCommand {
       'core/storage',
       'core/router',
       'core/error',
+      // Auth feature structure
+      'features/auth/data/models',
+      'features/auth/data/repositories',
+      'features/auth/data/datasources',
+      'features/auth/domain/entities',
+      'features/auth/domain/usecases',
+      'features/auth/domain/repositories',
       'features/auth/presentation/pages',
+      'features/auth/presentation/providers',
+      'features/auth/presentation/widgets',
+      // Home feature structure
+      'features/home/data/models',
+      'features/home/data/repositories',
+      'features/home/data/datasources',
+      'features/home/domain/entities',
+      'features/home/domain/usecases',
+      'features/home/domain/repositories',
       'features/home/presentation/pages',
+      'features/home/presentation/providers',
+      'features/home/presentation/widgets',
+      // Shared structure
       'shared/widgets',
       'shared/providers',
       'shared/functions',
@@ -213,10 +232,36 @@ class TokenManager {
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../storage/token_manager.dart';
 
-final routerProvider = Provider<GoRouter>((ref) {
+Future<String> _getInitialRoute() async {
+  final token = await TokenManager.getToken();
+  return token != null ? '/home' : '/login';
+}
+
+final routerProvider = FutureProvider<GoRouter>((ref) async {
+  final initialRoute = await _getInitialRoute();
+  
   return GoRouter(
-    initialLocation: '/login',
+    redirect: (context, state) async {
+      final token = await TokenManager.getToken();
+      final isLoggedIn = token != null;
+      final isOnLogin = state.matchedLocation == '/login';
+      final isOnHome = state.matchedLocation == '/home';
+
+      // If user is logged in and tries to access login, redirect to home
+      if (isLoggedIn && isOnLogin) {
+        return '/home';
+      }
+      
+      // If user is not logged in and tries to access home, redirect to login
+      if (!isLoggedIn && isOnHome) {
+        return '/login';
+      }
+
+      return null; // No redirect needed
+    },
+    initialLocation: initialRoute,
     routes: [
       GoRoute(
         path: '/login',
@@ -272,11 +317,27 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = ref.watch(routerProvider);
+    final routerAsync = ref.watch(routerProvider);
     
-    return MaterialApp.router(
-      title: 'Flutter Demo',
-      routerConfig: router,
+    return routerAsync.when(
+      data: (router) => MaterialApp.router(
+        title: 'Flutter Demo',
+        routerConfig: router,
+      ),
+      loading: () => const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      ),
+      error: (error, stack) => MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Text('Error: \$error'),
+          ),
+        ),
+      ),
     );
   }
 }''';
