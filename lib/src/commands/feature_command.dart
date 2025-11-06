@@ -201,9 +201,9 @@ class ${entityName}RepositoryImpl implements ${entityName}Repository {
   @override
   Future<Either<Failure, List<${entityName}Entity>>> get${entityName}s() async {
     try {
-      final response = await _dio.get('/${featureName}s');
+      final response = await _dio.get<dynamic>('/${featureName}s');
       final List<dynamic> data = response.data;
-      final models = data.map((json) => ${modelName}.fromJson(json)).toList();
+      final models = data.map((json) => $modelName.fromJson(json)).toList();
       final entities = models.map((model) => model.toEntity()).toList();
       return Right(entities);
     } catch (e) {
@@ -214,8 +214,8 @@ class ${entityName}RepositoryImpl implements ${entityName}Repository {
   @override
   Future<Either<Failure, ${entityName}Entity>> get${entityName}ById(int id) async {
     try {
-      final response = await _dio.get('/${featureName}s/\$id');
-      final model = ${modelName}.fromJson(response.data);
+      final response = await _dio.get<dynamic>('/${featureName}s/\$id');
+      final model = $modelName.fromJson(response.data);
       return Right(model.toEntity());
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -280,10 +280,10 @@ class ${entityName}Page extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${entityName}s'),
+        title: const Text('${entityName}s'),
       ),
       body: const Center(
-        child: Text('${entityName} Page'),
+        child: Text('$entityName Page'),
       ),
     );
   }
@@ -304,11 +304,11 @@ class ${entityName}Page extends ConsumerWidget {
     try {
       final routerContent = File(routerPath).readAsStringSync();
       final entityName = _toPascalCase(featureName);
-      final routePath = '/${featureName}';
+      final routePath = '/$featureName';
       final routeName = featureName;
 
       // Add import for the new feature page
-      final importLine = "import '../../features/${featureName}/presentation/pages/${featureName}_page.dart';";
+      final importLine = "import '../../features/$featureName/presentation/pages/${featureName}_page.dart';";
       final contentWithImport = _addImportIfNotExists(routerContent, importLine);
 
       // Add route constants to Router class
@@ -336,7 +336,7 @@ class ${entityName}Page extends ConsumerWidget {
     if (matches.isNotEmpty) {
       final lastMatch = matches.last;
       final insertPosition = lastMatch.end;
-      return content.substring(0, insertPosition) + '\n' + importLine + content.substring(insertPosition);
+      return '${content.substring(0, insertPosition)}\n$importLine${content.substring(insertPosition)}';
     }
 
     return content;
@@ -346,7 +346,7 @@ class ${entityName}Page extends ConsumerWidget {
     final camelCaseName = _toCamelCase(featureName);
     final routeConstant =
         '''
-  static const String ${camelCaseName} = '$routePath';
+  static const String $camelCaseName = '$routePath';
   static const String ${camelCaseName}Name = '$routeName';''';
 
     // Find the Router class and add constants before the closing brace
@@ -360,7 +360,7 @@ class ${entityName}Page extends ConsumerWidget {
     if (lastConstMatch.isNotEmpty) {
       final lastMatch = lastConstMatch.last;
       final insertPosition = lastMatch.end;
-      return content.substring(0, insertPosition) + '\n' + routeConstant + content.substring(insertPosition);
+      return '${content.substring(0, insertPosition)}\n$routeConstant${content.substring(insertPosition)}';
     }
 
     return content;
@@ -371,7 +371,7 @@ class ${entityName}Page extends ConsumerWidget {
     final routeToAdd =
         '''
       GoRoute(
-        path: Router.${camelCaseName},
+        path: Router.$camelCaseName,
         name: Router.${camelCaseName}Name,
         builder: (context, state) => const ${entityName}Page(),
       ),''';
@@ -391,7 +391,7 @@ class ${entityName}Page extends ConsumerWidget {
     final beforeRoutes = content.substring(0, routesEnd);
     final afterRoutes = content.substring(routesEnd);
 
-    return beforeRoutes + routeToAdd + '\n    ' + afterRoutes;
+    return '$beforeRoutes$routeToAdd\n    $afterRoutes';
   }
 
   String _toPascalCase(String input) {

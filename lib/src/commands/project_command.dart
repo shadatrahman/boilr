@@ -388,27 +388,28 @@ class AuthInterceptor extends Interceptor {
 
     // Generate Logging Interceptor
     final loggingInterceptorContent = '''import 'package:dio/dio.dart';
+import 'dart:developer' as developer show log;
 
 class LoggingInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    print('REQUEST[\${options.method}] => PATH: \${options.path}');
-    print('Headers: \${options.headers}');
-    print('Data: \${options.data}');
+    developer.log('REQUEST[\${options.method}] => PATH: \${options.path}');
+    developer.log('Headers: \${options.headers}');
+    developer.log('Data: \${options.data}');
     handler.next(options);
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print('RESPONSE[\${response.statusCode}] => PATH: \${response.requestOptions.path}');
-    print('Data: \${response.data}');
+  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+    developer.log('RESPONSE[\${response.statusCode}] => PATH: \${response.requestOptions.path}');
+    developer.log('Data: \${response.data}');
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    print('ERROR[\${err.response?.statusCode}] => PATH: \${err.requestOptions.path}');
-    print('Message: \${err.message}');
+    developer.log('ERROR[\${err.response?.statusCode}] => PATH: \${err.requestOptions.path}');
+    developer.log('Message: \${err.message}');
     handler.next(err);
   }
 }''';

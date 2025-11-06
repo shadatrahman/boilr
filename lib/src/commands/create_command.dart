@@ -6,7 +6,7 @@ import 'provider_command.dart';
 
 class CreateCommand {
   void runWithArgs(List<String> args) {
-    if (args.isEmpty) {
+    if (args.isEmpty || args.contains('--help') || args.contains('-h')) {
       print('boilr create - Create Flutter projects, features, widgets, pages, and providers');
       print('');
       print('Usage: boilr create <subcommand> [arguments]');
