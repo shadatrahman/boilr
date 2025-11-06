@@ -1,3 +1,24 @@
+## 0.0.3
+
+### Added
+
+- **Automatic Router Updates for Pages**: Page command now automatically updates `app_router.dart` with new routes
+  - Adds import for the new page
+  - Adds route constants to Router class (path and name)
+  - Adds GoRoute to routes array
+  - Provides type-safe navigation support for pages
+
+### Fixed
+
+- **Help Flag Handling**: Fixed CreateCommand to properly handle `--help` flag instead of treating it as a subcommand
+- **Page Creation Path**: Fixed page command to create files in `lib/shared/pages/` instead of `lib/shared/widgets/`
+- **Page File Structure**: Improved page generation with correct directory structure
+
+### Enhanced
+
+- **Page Command**: Now provides feature parity with feature command for automatic route registration
+- **Navigation Consistency**: Pages now follow the same navigation pattern as features with centralized Router class
+
 ## 0.0.2
 
 ### Changed
